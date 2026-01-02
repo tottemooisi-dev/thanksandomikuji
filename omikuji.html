@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>新春おみくじ 2026</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&family=Zen+Antique&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        miya: {
+                            kurenai: '#8E001C', // Deep Red
+                            akane: '#B7282E',   // Vibrant Red
+                            gold: '#d4af37',    // Gold
+                            pale: '#F2E6C2',    // Champagne
+                            sumi: '#1a1a1a',    // Charcoal
+                            paper: '#fcfcfc',   // Off-white
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Shippori Mincho"', 'serif'],
+                        antique: ['"Zen Antique"', 'serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-in-up': 'fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.05),
+                0 20px 40px -6px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+        }
+
+        .text-gradient-gold {
+            background: linear-gradient(to bottom, #d4af37 0%, #fdfbfb 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s infinite linear;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .noise-bg {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.4'/%3E%3C/svg%3E");
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
+
+        dialog[open]::backdrop {
+            opacity: 1;
+        }
+
+        dialog {
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        dialog[open] {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .vertical-text {
+            writing-mode: horizontal-tb;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-miya-paper text-miya-sumi font-serif h-screen w-screen overflow-hidden relative antialiased selection:bg-miya-akane/20 selection:text-miya-kurenai">
+
+    <!-- Global Background & Texture -->
+    <div class="absolute inset-0 z-0 bg-[#faf9f6]"></div>
+    <div class="absolute inset-0 z-0 noise-bg opacity-30 pointer-events-none mix-blend-multiply"></div>
+
+    <!-- MAIN CONTAINER -->
+    <div id="container" class="relative w-full h-full overflow-hidden">
+
+        <!-- STAGE 1: Greeting Letter -->
+        <div id="stage1"
+            class="stage absolute inset-0 flex flex-col items-center justify-center z-10 transition-all duration-1000 ease-out p-6">
+
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 pointer-events-none opacity-[0.03] select-none whitespace-nowrap z-0">
+                <span class="font-antique text-[25vw]">Thanks</span>
+            </div>
+
+            <div
+                class="glass-panel relative w-full max-w-3xl rounded-sm p-8 md:p-20 opacity-0 animate-fade-in-up z-10 border border-white/60">
+                <div
+                    class="absolute -top-10 -left-6 md:-top-16 md:-left-16 w-32 h-32 md:w-48 md:h-48 z-20 animate-float drop-shadow-2xl">
+                    <img src="https://gov.town.shimane-misato.lg.jp/reiki_int/reiki_honbun/word/r071IG00000025.jpg"
+                        alt="Logo"
+                        class="w-full h-full object-contain filter drop-shadow-md rounded-full bg-white/80 p-2 backdrop-blur-sm border border-white/40">
+                </div>
+
+                <div class="flex flex-col gap-8 md:gap-12 text-center items-center justify-center pt-8 md:pt-0">
+                    <p class="text-base md:text-xl leading-loose tracking-widest opacity-0 animate-fade-in-up"
+                        style="animation-delay: 0.3s;">
+                        温かいお餞別をいただき<br>
+                        心より御礼申し上げます
+                    </p>
+                    <p class="text-base md:text-xl leading-loose tracking-widest opacity-0 animate-fade-in-up"
+                        style="animation-delay: 0.6s;">
+                        新天地でもこの経験を活かし<br>
+                        精一杯頑張ります
+                    </p>
+                    <p class="text-base md:text-xl leading-loose tracking-widest opacity-0 animate-fade-in-up"
+                        style="animation-delay: 0.9s;">
+                        皆さんと過ごした時間は<br>
+                        これからも大切な財産です
+                    </p>
+
+                    <div class="self-end mt-4 mr-4 md:mr-10 font-antique text-miya-kurenai opacity-0 animate-fade-in-up"
+                        style="animation-delay: 1.2s;">
+                        by T.K.
+                    </div>
+                </div>
+            </div>
+
+            <button id="next-btn"
+                class="group absolute bottom-12 md:bottom-20 px-12 py-4 bg-miya-sumi text-white text-sm md:text-base tracking-[0.25em] font-serif rounded-sm shadow-xl 
+                                       opacity-0 translate-y-4 pointer-events-none transition-all duration-500 z-50
+                                       hover:bg-miya-kurenai hover:-translate-y-1 hover:shadow-2xl hover:tracking-[0.35em]">
+                <span class="relative z-10">次へ進む</span>
+            </button>
+        </div>
+
+        <!-- STAGE 2: Omikuji -->
+        <div id="stage2"
+            class="stage absolute inset-0 flex flex-col items-center justify-center z-10 transition-all duration-1000 ease-out opacity-0 pointer-events-none hidden scale-95"
+            style="background: radial-gradient(circle at center, #4a000e 0%, #1a0003 100%);">
+
+            <div
+                class="absolute top-1/4 left-1/4 w-96 h-96 bg-miya-kurenai/40 rounded-full blur-[100px] animate-pulse-slow">
+            </div>
+            <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-miya-gold/20 rounded-full blur-[80px] animate-float"
+                style="animation-delay: -2s;"></div>
+
+            <div class="relative z-10 text-center flex flex-col items-center gap-6">
+                <h1 class="font-antique text-6xl md:text-8xl tracking-widest text-gradient-gold drop-shadow-lg mb-4">
+                    謹賀新年
+                </h1>
+
+                <div class="text-miya-pale/90 text-sm md:text-lg font-light tracking-wider leading-loose">
+                    <p>旧年中は格別のご厚情を賜り<br>厚く御礼申し上げます</p>
+                    <p class="mt-2">本年も幸多き年となりますよう</p>
+                </div>
+
+                <button id="omikuji-btn"
+                    class="mt-12 group relative px-16 py-6 overflow-hidden rounded-sm bg-transparent border border-white/20 transition-all duration-300 hover:border-miya-gold/60 hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]">
+                    <div
+                        class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full transition-transform duration-700 group-hover:translate-x-full">
+                    </div>
+                    <span
+                        class="relative font-antique text-2xl md:text-3xl text-miya-paper tracking-[0.3em] group-hover:text-white transition-colors">運試しをする</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Hint Overlay -->
+        <div id="hint"
+            class="absolute inset-0 flex items-center justify-center z-30 pointer-events-none transition-opacity duration-500">
+            <div
+                class="px-8 py-3 bg-white/60 backdrop-blur-md rounded-full border border-white/50 text-miya-sumi tracking-widest shadow-lg animate-pulse-slow">
+                画面を削ってください
+            </div>
+        </div>
+
+        <canvas id="cover" class="absolute inset-0 z-20 touch-none cursor-crosshair"></canvas>
+        <canvas id="fx" class="absolute inset-0 z-25 pointer-events-none touch-none"></canvas>
+
+    </div>
+
+    <!-- Result Modal -->
+    <dialog id="result-modal"
+        class="backdrop:bg-black/90 bg-transparent p-0 w-[95%] max-w-lg m-auto focus:outline-none z-[9999]">
+        <div class="relative bg-[#FFFCF9] rounded-lg shadow-2xl overflow-hidden p-[2px]">
+            <!-- Border Gradient -->
+            <div class="absolute inset-0 bg-gradient-to-br from-miya-gold via-white to-miya-gold opacity-50"></div>
+
+            <div class="relative bg-[#FFFCF9] rounded-lg p-6 md:p-8 flex flex-col items-center text-center">
+                <!-- Watermark -->
+                <div class="absolute inset-0 opacity-[0.03]"
+                    style="background-image: radial-gradient(#d4af37 1px, transparent 1px); background-size: 20px 20px;">
+                </div>
+
+                <h2 id="result-text"
+                    class="relative font-antique text-5xl md:text-6xl text-miya-kurenai border-b border-miya-gold/30 pb-4 w-full mb-6">
+                    大吉
+                </h2>
+
+                <!-- Chart Container -->
+                <div class="relative w-full h-64 md:h-80 mb-6">
+                    <canvas id="result-chart"></canvas>
+                </div>
+
+                <div id="result-detail"
+                    class="relative text-left text-miya-sumi/80 text-sm w-full space-y-1 font-medium bg-miya-paper/50 p-4 rounded-md border border-miya-gold/10">
+                    <!-- JS fills this -->
+                </div>
+
+                <button id="close-btn"
+                    class="relative mt-6 w-12 h-12 rounded-full border border-miya-sumi/20 flex items-center justify-center text-miya-sumi transition-all duration-300 hover:bg-miya-sumi hover:text-white hover:rotate-90">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        const coverCanvas = document.getElementById("cover");
+        const coverCtx = coverCanvas.getContext("2d");
+        const fxCanvas = document.getElementById("fx");
+        const fxCtx = fxCanvas.getContext("2d");
+        const hint = document.getElementById("hint");
+        const nextBtn = document.getElementById("next-btn");
+        const omikujiBtn = document.getElementById("omikuji-btn");
+        const modal = document.getElementById("result-modal");
+        const resultText = document.getElementById("result-text");
+        const resultDetail = document.getElementById("result-detail");
+        const closeBtn = document.getElementById("close-btn");
+        const chartCanvas = document.getElementById("result-chart");
+
+        let currentStage = 1;
+        let isDrawing = false;
+        let hintHidden = false;
+        let particles = [];
+        let scratchCheckTimer = null;
+        let chartInstance = null;
+
+        // --- Chart.js Setup ---
+        function initChart(stats) {
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const ctx = chartCanvas.getContext('2d');
+
+            // Gradient Fill
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(212, 175, 55, 0.5)'); // Gold
+            gradient.addColorStop(1, 'rgba(142, 0, 28, 0.2)');   // Red
+
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['願望', '待人', '学問', '恋愛', '金運'],
+                    datasets: [{
+                        label: '運勢パラメータ',
+                        data: stats,
+                        backgroundColor: gradient,
+                        borderColor: '#d4af37', // Gold Border
+                        pointBackgroundColor: '#8E001C', // Red Points
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#d4af37',
+                        borderWidth: 2,
+                        pointRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            pointLabels: {
+                                font: {
+                                    family: "'Shippori Mincho', serif",
+                                    size: 14
+                                },
+                                color: '#555'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            ticks: { display: false, stepSize: 1 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // --- Logic (Unchanged except Chart integration) ---
+        function resize(reset = false) {
+            let temp;
+            if (!reset && coverCanvas.width > 0) {
+                temp = document.createElement('canvas');
+                temp.width = coverCanvas.width;
+                temp.height = coverCanvas.height;
+                temp.getContext('2d').drawImage(coverCanvas, 0, 0);
+            }
+
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            coverCanvas.width = w;
+            coverCanvas.height = h;
+            fxCanvas.width = w;
+            fxCanvas.height = h;
+
+            if (temp) {
+                coverCtx.globalCompositeOperation = "source-over";
+                coverCtx.drawImage(temp, 0, 0, w, h);
+            } else {
+                fillCover(w, h);
+            }
+            coverCtx.globalCompositeOperation = "destination-out";
+        }
+
+        function fillCover(w, h) {
+            coverCtx.globalCompositeOperation = "source-over";
+            if (currentStage === 1) {
+                coverCtx.fillStyle = "#faf9f6";
+                coverCtx.fillRect(0, 0, w, h);
+            }
+        }
+
+        window.addEventListener("resize", () => resize(false));
+        resize(true);
+
+        function erase(x, y) {
+            if (!hintHidden) {
+                hint.classList.add('opacity-0');
+                setTimeout(() => hint.style.display = 'none', 500);
+                hintHidden = true;
+            }
+
+            coverCtx.beginPath();
+            let jitterX = (Math.random() - 0.5) * 5;
+            let jitterY = (Math.random() - 0.5) * 5;
+            coverCtx.arc(x + jitterX, y + jitterY, 50, 0, Math.PI * 2);
+            coverCtx.fill();
+
+            spawnParticles(x, y, 5);
+
+            if (!scratchCheckTimer) scratchCheckTimer = setTimeout(checkScratchCompletion, 400);
+        }
+
+        const getPos = (e) => {
+            if (e.touches) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            return { x: e.clientX, y: e.clientY };
+        };
+
+        ["mousedown", "touchstart"].forEach(ev => {
+            coverCanvas.addEventListener(ev, (e) => {
+                isDrawing = true;
+                const { x, y } = getPos(e);
+                erase(x, y);
+                checkButtonClick(x, y);
+            }, { passive: false });
+        });
+
+        ["mousemove", "touchmove"].forEach(ev => {
+            coverCanvas.addEventListener(ev, (e) => {
+                if (!isDrawing) return;
+                if (ev === "touchmove") e.preventDefault();
+                const { x, y } = getPos(e);
+                erase(x, y);
+            }, { passive: false });
+        });
+
+        ["mouseup", "mouseleave", "touchend"].forEach(ev => {
+            coverCanvas.addEventListener(ev, () => isDrawing = false);
+        });
+
+        function checkScratchCompletion() {
+            scratchCheckTimer = null;
+            if (currentStage === 1 && nextBtn.classList.contains("opacity-0")) {
+                const w = coverCanvas.width;
+                const h = coverCanvas.height;
+                if (w === 0 || h === 0) return;
+
+                try {
+                    const params = { x: w * 0.2, y: h * 0.2, w: w * 0.6, h: h * 0.6 };
+                    const imageData = coverCtx.getImageData(params.x, params.y, params.w, params.h);
+                    const data = imageData.data;
+                    let transparent = 0;
+                    let total = 0;
+
+                    for (let i = 0; i < data.length; i += 400) {
+                        if (data[i + 3] === 0) transparent++;
+                        total++;
+                    }
+
+                    if (total > 0 && (transparent / total) > 0.25) {
+                        nextBtn.classList.remove("opacity-0", "translate-y-4", "pointer-events-none");
+                        nextBtn.classList.add("translate-y-0", "pointer-events-auto", "opacity-100");
+                    }
+                } catch (e) { }
+            }
+        }
+
+        function checkButtonClick(x, y) {
+            if (currentStage === 1) {
+                const rect = nextBtn.getBoundingClientRect();
+                if (!nextBtn.classList.contains("opacity-0")) {
+                    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                        nextBtn.click();
+                    }
+                }
+            }
+        }
+
+        nextBtn.addEventListener("click", () => {
+            currentStage = 2;
+            const s1 = document.getElementById("stage1");
+            const s2 = document.getElementById("stage2");
+
+            s1.style.opacity = '0';
+            s1.style.pointerEvents = 'none';
+
+            setTimeout(() => {
+                s1.classList.add('hidden');
+
+                s2.classList.remove('hidden', 'scale-95');
+
+                setTimeout(() => {
+                    s2.classList.remove('opacity-0', 'pointer-events-none');
+                    s2.classList.add('opacity-100', 'pointer-events-auto');
+                }, 50);
+
+                coverCtx.globalCompositeOperation = "destination-out";
+                coverCtx.fillStyle = "rgba(0,0,0,1)";
+                coverCtx.fillRect(0, 0, coverCanvas.width, coverCanvas.height);
+
+                hint.style.display = "none";
+                coverCanvas.style.pointerEvents = "none";
+
+            }, 800);
+        });
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.speedY = (Math.random() - 0.5) * 2;
+                this.life = 1.0;
+                this.color = `hsla(45, 80%, 60%, ${Math.random()})`;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY + 0.5;
+                this.life -= 0.02;
+                this.size *= 0.95;
+            }
+            draw(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.life;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function handleParticles() {
+            fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw(fxCtx);
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(handleParticles);
+        }
+        handleParticles();
+
+        function spawnParticles(x, y, count = 3) {
+            for (let i = 0; i < count; i++) particles.push(new Particle(x, y));
+        }
+
+        // --- Omikuji Data with Stats ---
+        const fortunes = [
+            {
+                res: "超大吉",
+                detail: "何もかもが上手くいく最強の運勢。<br>迷わず突き進めば道は開かれる。",
+                stats: [5, 5, 5, 5, 5] // All Max
+            },
+            {
+                res: "ウルトラ大吉",
+                detail: "想像を超える幸運が舞い込む予感。<br>新しい挑戦が吉と出る。",
+                stats: [5, 5, 5, 5, 5]
+            },
+            {
+                res: "ハイパー大吉",
+                detail: "知力と体力が充実する時期。<br>学びの成果が大きく実る。",
+                stats: [5, 5, 5, 5, 5]
+            },
+            {
+                res: "ミラクル大吉",
+                detail: "奇跡的な出会いが待っている。<br>人との縁を大切に。",
+                stats: [5, 5, 5, 5, 5]
+            },
+            {
+                res: "アルティメット大吉",
+                detail: "全宇宙が味方するレベル。<br>金運も恋愛も絶好調。",
+                stats: [5, 5, 5, 5, 5]
+            }
+        ];
+
+        if (localStorage.getItem("omikuji_2026") !== null) {
+            omikujiBtn.querySelector('span').textContent = "おみくじ結果を見る";
+        }
+
+        function drawOmikuji() {
+            let index;
+            const saved = localStorage.getItem("omikuji_2026");
+
+            if (saved !== null) {
+                index = parseInt(saved);
+            } else {
+                let r = Math.random();
+                if (r < 0.45) index = 0;
+                else if (r < 0.7) index = 1;
+                else if (r < 0.85) index = 3;
+                else if (r < 0.95) index = 2;
+                else index = 4;
+                localStorage.setItem("omikuji_2026", index);
+            }
+
+            let f = fortunes[index];
+            omikujiBtn.querySelector('span').textContent = "おみくじ結果を見る";
+
+            resultText.textContent = f.res;
+            resultDetail.innerHTML = f.detail;
+
+            modal.showModal();
+
+            // Render Chart with delay for modal animation
+            setTimeout(() => {
+                initChart(f.stats);
+            }, 100);
+
+            for (let i = 0; i < 80; i++) {
+                spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 1);
+            }
+        }
+
+        omikujiBtn.addEventListener("click", drawOmikuji);
+
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => modal.close());
+        }
+
+        window.resetOmikuji = function () {
+            localStorage.removeItem("omikuji_2026");
+            omikujiBtn.querySelector('span').textContent = "運試しをする";
+            alert("リセットしました");
+        };
+    </script>
+</body>
+
+</html>
